@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Хориоамнионит — рабочее место</title>
+<style>
+:root{
+  --bg:#0E1113; --surface:#171B1F; --surface2:#1F252A; --line:#2C343A;
+  --ink:#E9E5DE; --dim:#9AA4AB; --faint:#6E7981;
+  --fever:#E0A32E; --alarm:#E2503F; --calm:#3FA796; --violet:#8A7CC8;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{overflow-x:clip}
+body::before{content:"";position:fixed;inset:0;background:var(--bg);z-index:-1}
+body{
+  background:var(--bg)!important;color:var(--ink);margin:0;overflow-x:clip;
+  font:16px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  padding-bottom:60px;
+}
+h1,h2,h3{font-family:Georgia,"Times New Roman",serif;font-weight:600;letter-spacing:-.01em;margin:0}
+.wrap{max-width:860px;margin:0 auto;padding:0 14px}
+
+/* ── шапка ── */
+header{padding:18px 0 12px}
+.eyebrow{font:600 11px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.18em;text-transform:uppercase;color:var(--fever)}
+h1{font-size:26px;margin:8px 0 6px}
+.sub{color:var(--dim);font-size:13px}
+
+/* ── вкладки ── */
+#rail{position:sticky;top:0;z-index:30;background:rgba(14,17,19,.96);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);margin-bottom:16px}
+#rail .inner{display:flex;gap:6px;overflow-x:auto;scroll-snap-type:x proximity;padding:9px 14px;max-width:860px;margin:0 auto;scrollbar-width:none}
+#rail .inner::-webkit-scrollbar{display:none}
+.tab{flex:0 0 auto;scroll-snap-align:start;background:var(--surface);border:1px solid var(--line);color:var(--dim);
+  padding:8px 13px;border-radius:999px;font-size:13.5px;font-weight:600;cursor:pointer;white-space:nowrap;transition:.15s}
+.tab:hover{color:var(--ink)}
+.tab.on{background:var(--fever);border-color:var(--fever);color:#14100A}
+.tab:focus-visible{outline:2px solid var(--calm);outline-offset:2px}
+
+section{display:none;animation:in .18s ease}
+section.on{display:block}
+@keyframes in{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:15px;margin-bottom:12px}
+.card h2{font-size:19px;margin-bottom:4px}
+.card h3{font-size:15px;font-family:inherit;font-weight:700;margin:14px 0 6px;color:var(--ink)}
+.card h3:first-child{margin-top:0}
+.lead{color:var(--dim);font-size:13.5px;margin:0 0 12px}
+p{margin:0 0 10px}
+ul{margin:0 0 10px;padding-left:18px}li{margin-bottom:5px}
+b{font-weight:700}
+small{color:var(--faint);font-size:12px;line-height:1.45;display:block}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+hr{border:0;border-top:1px solid var(--line);margin:14px 0}
+
+/* ── поля ввода ── */
+.row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--line)}
+.row:last-child{border-bottom:0}
+.row label{flex:1;font-size:14px}
+input[type=number],input[type=text]{
+  width:88px;background:var(--surface2);border:1px solid var(--line);border-radius:8px;color:var(--ink);
+  padding:8px 10px;font:600 15px ui-monospace,Menlo,monospace;text-align:right}
+input:focus{outline:2px solid var(--calm);outline-offset:1px;border-color:var(--calm)}
+.unit{color:var(--faint);font-size:12px;width:42px}
+.chk{display:flex;align-items:flex-start;gap:9px;padding:8px 0;cursor:pointer;font-size:14px}
+.chk input{width:19px;height:19px;margin:1px 0 0;accent-color:var(--fever);flex:0 0 auto}
+
+/* ── вердикт ── */
+.verdict{border-radius:10px;padding:13px;margin-top:12px;border:1px solid}
+.v-no{background:rgba(63,167,150,.08);border-color:rgba(63,167,150,.4)}
+.v-yes{background:rgba(226,80,63,.1);border-color:rgba(226,80,63,.5)}
+.v-warn{background:rgba(224,163,46,.1);border-color:rgba(224,163,46,.45)}
+.v-title{font:700 16px/1.3 inherit;margin-bottom:5px}
+.v-no .v-title{color:var(--calm)} .v-yes .v-title{color:var(--alarm)} .v-warn .v-title{color:var(--fever)}
+.crit{display:flex;gap:8px;font-size:13.5px;padding:3px 0;color:var(--dim)}
+.crit b{color:var(--ink);font-weight:600}
+.mark{width:16px;flex:0 0 auto;font-weight:700}
+.hit{color:var(--alarm)} .miss{color:var(--faint)}
+
+/* ── Duck Score ── */
+.param{border-bottom:1px solid var(--line);padding:13px 0}
+.param:last-of-type{border-bottom:0}
+.param-name{font-weight:700;font-size:14.5px;margin-bottom:8px;display:flex;justify-content:space-between;gap:10px}
+.pts{font:700 13px ui-monospace,Menlo,monospace;color:var(--faint)}
+.opts{display:grid;gap:6px}
+.opt{display:flex;gap:9px;align-items:flex-start;background:var(--surface2);border:1px solid transparent;
+  border-radius:9px;padding:9px 10px;cursor:pointer;font-size:13px;line-height:1.4;color:var(--dim);transition:.12s}
+.opt:hover{border-color:var(--line)}
+.opt input{margin:2px 0 0;accent-color:var(--fever);flex:0 0 auto}
+.opt.sel{color:var(--ink);border-color:var(--fever);background:rgba(224,163,46,.09)}
+.opt .n{font:700 12px ui-monospace,Menlo,monospace;color:var(--faint);flex:0 0 14px}
+.opt.sel .n{color:var(--fever)}
+
+.meter{position:sticky;bottom:0;z-index:20;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:13px;margin-top:12px}
+.meter-top{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:9px}
+.score{font:700 30px/1 ui-monospace,Menlo,monospace}
+.score span{font-size:15px;color:var(--faint)}
+.bar{height:9px;background:var(--surface2);border-radius:5px;overflow:hidden;position:relative}
+.fill{height:100%;width:0;background:var(--calm);transition:width .25s,background .25s}
+.thresh{position:absolute;left:55%;top:-3px;bottom:-3px;width:2px;background:var(--ink);opacity:.5}
+.meter-msg{font-size:13.5px;margin-top:9px;line-height:1.45}
+
+/* ── таблицы / сетки ── */
+.grid3{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(210px,1fr))}
+.box{background:var(--surface2);border:1px solid var(--line);border-radius:10px;padding:12px}
+.box .ttl{font:700 13px ui-monospace,Menlo,monospace;color:var(--fever);letter-spacing:.03em;margin-bottom:7px}
+.box ul{padding-left:16px;margin:0;font-size:13.5px}
+table{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:10px}
+th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--faint);font:600 11px ui-monospace,Menlo,monospace;letter-spacing:.06em;text-transform:uppercase}
+td.num{font-family:ui-monospace,Menlo,monospace;white-space:nowrap;color:var(--fever);font-weight:600}
+
+.pill{display:inline-block;background:var(--surface2);border:1px solid var(--line);border-radius:6px;
+  padding:2px 7px;font:600 11.5px ui-monospace,Menlo,monospace;color:var(--dim);margin:0 4px 4px 0}
+.pill.a{color:var(--alarm);border-color:rgba(226,80,63,.4)}
+.pill.c{color:var(--calm);border-color:rgba(63,167,150,.4)}
+
+button.act{background:var(--fever);color:#14100A;border:0;border-radius:9px;padding:11px 16px;
+  font:700 14px inherit;cursor:pointer;width:100%;margin-top:10px}
+button.act:active{transform:translateY(1px)}
+button.ghost{background:transparent;color:var(--dim);border:1px solid var(--line)}
+pre.note{background:var(--surface2);border:1px solid var(--line);border-radius:10px;padding:12px;
+  white-space:pre-wrap;word-wrap:break-word;font:13px/1.55 ui-monospace,Menlo,monospace;color:var(--ink);margin:0}
+.src{color:var(--faint);font-size:11.5px;line-height:1.5;margin-top:14px;padding-top:10px;border-top:1px solid var(--line)}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+<header>
+  <div class="eyebrow">O41.1 · КР 776 (2023) · пересмотр 2025</div>
+  <h1>Хориоамнионит</h1>
+  <div class="sub">Диагноз у постели, Chorio Duck Score, тактика и дозы. Всё считается на месте.</div>
+</header>
+</div>
+
+<nav id="rail"><div class="inner">
+  <button class="tab on" data-t="dx">Диагноз</button>
+  <button class="tab" data-t="duck">Duck Score</button>
+  <button class="tab" data-t="tac">Тактика</button>
+  <button class="tab" data-t="abx">Антибиотики</button>
+  <button class="tab" data-t="mon">Мониторинг</button>
+  <button class="tab" data-t="pro">ПРПО и профилактика</button>
+  <button class="tab" data-t="rec">Запись</button>
+</div></nav>
+
+<div class="wrap">
+
+<!-- ══ ДИАГНОЗ ══ -->
+<section id="dx" class="on">
+  <div class="card">
+    <h2>Клинический диагноз</h2>
+    <p class="lead">Фебрильная лихорадка <b>плюс два</b> признака из четырёх. Введите значения — критерии посчитаются сами.</p>
+
+    <div class="row"><label>Температура тела</label><input type="number" id="i_t" step="0.1" placeholder="—"><span class="unit">°C</span></div>
+    <div class="row"><label>ЧСС матери</label><input type="number" id="i_mhr" placeholder="—"><span class="unit">/мин</span></div>
+    <div class="row"><label>ЧСС плода (базальная)</label><input type="number" id="i_fhr" placeholder="—"><span class="unit">/мин</span></div>
+    <div class="row"><label>Лейкоциты</label><input type="number" id="i_wbc" step="0.1" placeholder="—"><span class="unit">×10⁹/л</span></div>
+    <div class="row"><label>С-реактивный белок</label><input type="number" id="i_crp" step="0.1" placeholder="—"><span class="unit">мг/л</span></div>
+    <label class="chk"><input type="checkbox" id="i_disch"><span>Гноевидные или гноевидно-сукровичные выделения из влагалища</span></label>
+    <label class="chk"><input type="checkbox" id="i_gks"><span>Пациентка получает кортикостероиды — лейкоцитоз как критерий не учитывается</span></label>
+
+    <div id="dxOut"></div>
+  </div>
+
+  <div class="card">
+    <h3>Верификация диагноза</h3>
+    <ul>
+      <li>Патологоанатомическое исследование последа — признаки воспаления в оболочках и плаценте <span class="pill c">A / 2</span></li>
+      <li>Микробиологическое (культуральное) исследование отделяемого половых путей и/или околоплодных вод: патогены или УПМ &gt;10⁵ КОЕ/мл. Однократно, независимо от подтекания вод <span class="pill c">A / 2</span></li>
+    </ul>
+    <small>Верификация ретроспективна и не должна задерживать начало терапии и родоразрешение.</small>
+  </div>
+
+  <div class="card">
+    <h3>Что повышает риск</h3>
+    <table>
+      <tr><th>Фактор</th><th>Риск</th></tr>
+      <tr><td>Безводный промежуток ≥12 ч</td><td class="num">×5,8</td></tr>
+      <tr><td>Безводный промежуток ≥18 ч</td><td class="num">×6,9</td></tr>
+      <tr><td>Продолжительность родов ≥12 ч</td><td class="num">×4,0</td></tr>
+      <tr><td>Второй период ≥2 ч</td><td class="num">×3,7</td></tr>
+      <tr><td>≥3 влагалищных исследования при вскрытых оболочках</td><td class="num">×2–5</td></tr>
+      <tr><td>Колонизация стрептококком группы B</td><td class="num">×1,7–7,2</td></tr>
+      <tr><td>Бактериальный вагиноз</td><td class="num">×1,7</td></tr>
+    </table>
+    <small>Частота: 1–6% всех беременностей, 40–70% преждевременных родов с ПРПО. 85% случаев выявляется в родах.
+    При отсутствии родовой деятельности и ПРПО от влагалищного исследования отказываются — информации не даёт, восходящую инфекцию усиливает.</small>
+  </div>
+</section>
+
+<!-- ══ DUCK SCORE ══ -->
+<section id="duck">
+  <div class="card">
+    <h2>Chorio Duck Score</h2>
+    <p class="lead">Пять параметров по 0–2. Порог вмешательства — <b>&gt;5</b>. Инструмент опережает клинический диагноз: у 70% женщин с тяжёлым исходом материнской лихорадки и тахикардии не было вовсе.</p>
+    <div id="params"></div>
+  </div>
+
+  <div class="meter">
+    <div class="meter-top">
+      <div class="score" id="sc">0<span> / 10</span></div>
+      <div class="pts" id="scLabel">порог &gt;5</div>
+    </div>
+    <div class="bar"><div class="fill" id="fill"></div><div class="thresh"></div></div>
+    <div class="meter-msg" id="scMsg">Отметьте параметры выше.</div>
+  </div>
+
+  <div class="card">
+    <h3>Логика «утки»</h3>
+    <table>
+      <tr><th>Признак</th><th>Патофизиология</th><th>Что видно</th></tr>
+      <tr><td><b>Выглядит</b> как утка</td><td>Условия для входа и размножения бактерий</td><td>ПРПО, отслоение оболочек в анамнезе, меконий</td></tr>
+      <tr><td><b>Ходит</b> как утка</td><td>Рост метаболизма плода</td><td>&gt;10% прирост базального ритма от исходного</td></tr>
+      <tr><td><b>Крякает</b> как утка</td><td>Начало FIRS</td><td>Утрата акцелераций</td></tr>
+      <tr><td><b>Держит плакат</b> «я утка»</td><td>Нейровоспаление, выход токсинов к матери</td><td>ZigZag, синусоида, тахикардия и лихорадка матери</td></tr>
+    </table>
+    <small>Прирост базального ритма на 10% даёт подъём температуры плода на 1 °C. У 43% плодов с гистологически подтверждённым хориоамнионитом базальный ритм так и не превысил 160/мин — то есть «нормальный» диапазон 110–160 их пропускает.</small>
+  </div>
+
+  <div class="card">
+    <h3>Что делать при высоком счёте</h3>
+    <ul>
+      <li>Прекратить наслоение гипоксического стресса: воспалённый мозг плода повреждается при меньшей гипоксии, чем здоровый.</li>
+      <li>Если самопроизвольные роды не близки — родоразрешение ускорить, не дожидаясь материнских признаков.</li>
+      <li>Довод «вырастет частота КС» не подтверждается: при продолжении родов около 90% этих плодов всё равно уходят на экстренное КС, но позже и с худшим исходом.</li>
+    </ul>
+    <small>Оговорка: счёт валидирован ретроспективно на 10 разобранных случаях (медико-правовые и риск-менеджмент). Это инструмент клинического мышления, а не проверенный крупными исследованиями стандарт. Консенсус 2024 упоминает его именно с этой оговоркой.</small>
+  </div>
+
+  <div class="src">Chandraharan E, Bolten M. Recognition of Chorioamnionitis on the CTG: the role of the “Chorio Duck Score”. Eur J Med Health Sci. 2024;6(1):1–9. CC BY 4.0 — таблица II переведена и адаптирована.
+  В строке «нейровоспаление» оригинал даёт для 1 балла «отсутствие цикличности &gt;50 мин», для 2 баллов — «&gt;20 мин при повышенном базальном ритме»: разница не в длительности, а в фоне базального ритма.</div>
+</section>
+
+<!-- ══ ТАКТИКА ══ -->
+<section id="tac">
+  <div class="card">
+    <h2>Родоразрешение</h2>
+    <p class="lead">Вопрос о родоразрешении рассматривается <b>независимо от гестационного срока</b>. Выбор способа и его осуществление — в течение 24 часов от постановки диагноза.</p>
+    <div class="grid3">
+      <div class="box"><div class="ttl">&lt; 24 нед</div><ul><li>Антибиотикотерапия</li><li>Парацетамол</li></ul></div>
+      <div class="box"><div class="ttl">24⁰ – 33⁶ нед</div><ul><li>Антибиотикотерапия</li><li>Парацетамол</li><li>Магния сульфат — нейропротекция</li><li>Глюкокортикоиды — рассмотреть</li></ul></div>
+      <div class="box"><div class="ttl">≥ 34 нед</div><ul><li>Антибиотикотерапия</li><li>Парацетамол</li></ul></div>
+    </div>
+    <p style="margin-top:12px">Далее во всех трёх — ускоренное родоразрешение, затем подтверждение диагноза по микробиологии и/или гистологии.</p>
+  </div>
+
+  <div class="card">
+    <h3>Способ родоразрешения</h3>
+    <ul>
+      <li><b>По умолчанию — через естественные родовые пути</b>, индукция или родостимуляция, если нет показаний к КС. <span class="pill c">A / 2</span></li>
+      <li>КС ради укорочения родов не показано: на фоне антибиотиков связи длительности родов с исходом для новорождённого нет. КС повышает риск раневой инфекции, эндометрита, ВТЭО.</li>
+      <li>При преждевременных родах КС не является методом выбора. <span class="pill">B / 3</span></li>
+    </ul>
+    <h3>Исключения, где КС предпочтительнее</h3>
+    <table>
+      <tr><th>Ситуация</th><th>Решение</th></tr>
+      <tr><td>24–27 нед</td><td>КС — ниже частота тяжёлых неонатальных осложнений</td></tr>
+      <tr><td>Масса плода не соответствует сроку, до 31 нед</td><td>КС</td></tr>
+      <tr><td>32–33 нед, масса соответствует сроку</td><td>Вагинальные роды — исходы лучше</td></tr>
+      <tr><td>Тазовое предлежание до 32 нед</td><td>КС <span class="pill">B / 2</span></td></tr>
+      <tr><td>&lt;27 нед, тазовое</td><td>КС — ниже неонатальная смертность и тяжёлые ВЖК</td></tr>
+    </table>
+    <small>Способ индивидуализируется по периоду родов, виду тазового предлежания, состоянию плода и наличию врача, владеющего техникой. При технической возможности — извлечение плода в плодных оболочках.</small>
+  </div>
+
+  <div class="card">
+    <h3>Слабость и дискоординация родовой деятельности</h3>
+    <p>Ожидаемы: бактерии снижают чувствительность рецепторов миометрия к окситоцину. Индукция или родоусиление внутривенной инфузией окситоцина. <span class="pill">B / 3</span></p>
+    <h3>Куда госпитализировать</h3>
+    <p>Стационар акушерского профиля 2-го или 3-го уровня в зависимости от срока беременности. Консультация анестезиолога-реаниматолога при планируемом КС.</p>
+  </div>
+</section>
+
+<!-- ══ АНТИБИОТИКИ ══ -->
+<section id="abx">
+  <div class="card">
+    <h2>Антибактериальная терапия</h2>
+    <p class="lead">Снижает неонатальную заболеваемость и гнойно-септические осложнения у матери. <span class="pill c">A / 1</span> Начинать сразу при постановке клинического диагноза.</p>
+    <div class="row"><label>Масса тела — для расчёта гентамицина</label><input type="number" id="i_wt" placeholder="—"><span class="unit">кг</span></div>
+    <div id="gentOut" style="margin-top:10px"></div>
+  </div>
+
+  <div class="card">
+    <h3>Схемы выбора</h3>
+    <table>
+      <tr><th>Схема</th><th>Дозирование</th></tr>
+      <tr><td><b>Ампициллин + гентамицин</b></td><td>Ампициллин 2 г в/в каждые 6 ч<br>+ гентамицин по расчёту выше</td></tr>
+      <tr><td><b>Цефазолин + гентамицин</b></td><td>Цефазолин 2 г в/в каждые 8 ч<br>+ гентамицин по расчёту выше</td></tr>
+    </table>
+    <h3>Монотерапия</h3>
+    <table>
+      <tr><td>Ампициллин + сульбактам</td><td class="num">1,5 г в/в q6ч</td></tr>
+      <tr><td>Цефокситин</td><td class="num">2 г в/в q8ч</td></tr>
+      <tr><td>Цефтриаксон</td><td class="num">1 г q24ч<br>до 4 г/сут при тяжёлом течении</td></tr>
+    </table>
+    <h3>Аллергия на пенициллины</h3>
+    <table>
+      <tr><td>Клиндамицин</td><td class="num">900 мг в/в q8ч</td></tr>
+      <tr><td>или ванкомицин</td><td class="num">1 г в/в q12ч</td></tr>
+      <tr><td>+ гентамицин</td><td class="num">по расчёту выше</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3>При родоразрешении путём КС</h3>
+    <p>Дополнительная доза: <b>клиндамицин 900 мг в/в</b> или <b>метронидазол 500 мг в/в</b>. <span class="pill">B / 2</span></p>
+    <h3>Когда отменять</h3>
+    <p>В послеродовом периоде — при отсутствии клиники эндометрита в течение 24 ч. <span class="pill c">A / 2</span> Метаанализ не показал разницы в частоте осложнений между продолжением антибиотиков и плацебо после родов.</p>
+  </div>
+
+  <div class="card">
+    <h2>Сопутствующая терапия</h2>
+    <h3>Парацетамол — лихорадка</h3>
+    <p>500 мг внутрь каждые 4–6 ч, не более 4 г/сут. Перорально, ректально или внутривенно; при в/в максимальная концентрация через 15 мин. <span class="pill">B / 2</span></p>
+    <small>Лихорадка в родах сама по себе тянет за собой тахикардию плода, оперативные роды, КС, неонатальную энцефалопатию, ишемический инсульт и судороги новорождённого. Сбивать — не косметика.</small>
+
+    <hr>
+    <h3>Магния сульфат — нейропротекция, 24⁰–33⁶ нед</h3>
+    <p>Нагрузочная доза <b>4 г за 20–30 мин</b>, затем <b>1 г/ч в течение 24 ч</b> в/в. <span class="pill c">A / 1</span></p>
+    <ul>
+      <li>Максимальный эффект — до 30⁶ нед.</li>
+      <li>Противопоказан при миастении и нарушении сердечной проводимости; при почечной недостаточности доза индивидуально.</li>
+      <li><b>Родоразрешение ради полного курса не откладывать.</b></li>
+    </ul>
+
+    <hr>
+    <h3>Глюкокортикоиды — профилактика РДС, 24⁰–33⁶ нед</h3>
+    <p>Вопрос спорный: иммуносупрессия может активировать инфекцию. Но новорождённые от матерей с ХА, получивших даже <b>неполный</b> курс, имели ниже риск смерти и неблагоприятных исходов без роста сепсиса. <span class="pill">C / 3</span></p>
+    <p><b>Родоразрешение ради полного курса не откладывать.</b></p>
+  </div>
+</section>
+
+<!-- ══ МОНИТОРИНГ ══ -->
+<section id="mon">
+  <div class="card">
+    <h2>Что и как часто</h2>
+    <table>
+      <tr><th>Исследование</th><th>Частота</th></tr>
+      <tr><td>Термометрия</td><td class="num">каждые 4 ч</td></tr>
+      <tr><td>Клинический анализ крови</td><td class="num">1 раз в 12 ч<br>до родоразрешения</td></tr>
+      <tr><td>С-реактивный белок</td><td class="num">1 раз в 12 ч<br>до родоразрешения</td></tr>
+      <tr><td>Посев отделяемого половых путей</td><td class="num">однократно</td></tr>
+      <tr><td>КТГ в родах</td><td class="num">непрерывно</td></tr>
+      <tr><td>УЗИ плода</td><td class="num">фетометрия,<br>положение, предлежание</td></tr>
+      <tr><td>Гистология последа</td><td class="num">обязательно</td></tr>
+    </table>
+    <p>Пороговые значения: лейкоциты <b>&gt;15×10⁹/л</b> (вне приёма кортикостероидов), СРБ <b>&gt;5 мг/л</b>.</p>
+    <small>Также: группа крови и резус-фактор — готовность к гемотрансфузии; ВИЧ, сифилис, HBsAg, anti-HCV, если не сдавались за последние 3 месяца.</small>
+  </div>
+
+  <div class="card">
+    <h3>КТГ: что читать</h3>
+    <p>По КР признаки ХА — тахикардия плода &gt;160/мин и отсутствие акцелераций, при этом сама КР честно оговаривает, что ни один из этих признаков не связан с ростом неблагоприятных исходов.</p>
+    <p>Именно поэтому имеет смысл смотреть шире — по Duck Score: прирост базального ритма &gt;10% <b>от исходного для этого плода</b>, отсутствие цикличности, ZigZag, синусоида, миометральная раздражимость на токо.</p>
+    <small>Различие принципиальное: «&gt;160» — популяционный порог, «+10% от своего» — индивидуальный. Плод с исходным ритмом 120, ушедший на 140, по первому критерию невидим.</small>
+  </div>
+
+  <div class="card">
+    <h3>Чем это грозит новорождённому</h3>
+    <p>Группа высокого риска: неонатальный сепсис, бронхолёгочная дисплазия, внутрижелудочковые кровоизлияния, перивентрикулярная лейкомаляция, неонатальная смерть.</p>
+    <p>Связь с церебральным параличом в литературе противоречива: часть исследований её показывает, часть нет.</p>
+    <h3>Чем это грозит матери</h3>
+    <p>Рост риска КС, послеродового кровотечения из-за атонии, разрыва матки, гемотрансфузии, эндомиометрита, раневой инфекции, тазового абсцесса, септического тромбофлебита таза и сепсиса.</p>
+  </div>
+</section>
+
+<!-- ══ ПРОФИЛАКТИКА ══ -->
+<section id="pro">
+  <div class="card">
+    <h2>ПРПО менее 36⁶ недель</h2>
+    <p class="lead">Антибактериальная терапия для пролонгирования беременности и профилактики ХА. <span class="pill c">A / 2</span> Снижает частоту ХА, неонатальной инфекции и перинатальной смертности.</p>
+    <table>
+      <tr><th>Препарат</th><th>Схема</th></tr>
+      <tr><td>Ампициллин</td><td class="num">2 г в/в q6ч × 48 ч</td></tr>
+      <tr><td>Амоксициллин</td><td class="num">250 мг q8ч × 5 дней</td></tr>
+      <tr><td>или эритромицин</td><td class="num">250 мг q6ч, максимум 10 дней</td></tr>
+    </table>
+    <small>Повторный курс — по результатам инфекционно-воспалительного мониторинга.</small>
+    <h3>Подтверждение подтекания</h3>
+    <p>Осмотр в зеркалах или тест. Цитологический тест — ложноотрицательные &gt;20%; нитразиновый — ложноположительные 5–30%; ПСИФР-1 и ПАМГ-1 — тесты выбора.</p>
+  </div>
+
+  <div class="card">
+    <h2>Скрининг во время беременности</h2>
+    <table>
+      <tr><th>Что</th><th>Когда</th></tr>
+      <tr><td>Антиген стрептококка группы B в цервикальном канале</td><td class="num">36⁰–37⁶ нед <span class="pill c">B/1</span></td></tr>
+      <tr><td>Микроскопия влагалищного мазка</td><td class="num">1-й визит<br>и III триместр <span class="pill">B/3</span></td></tr>
+      <tr><td>Посев средней порции мочи</td><td class="num">1-й визит,<br>однократно <span class="pill c">A/1</span></td></tr>
+    </table>
+    <small>Бессимптомная бактериурия — бактерии в диагностическом титре в двух последовательных посевах с разницей не более 14 дней при отсутствии симптомов. Своевременное лечение нарушений флоры влагалища снижает риск инфекционных осложнений.</small>
+  </div>
+
+  <div class="card">
+    <h2>Критерии качества медицинской помощи</h2>
+    <p class="lead">Шесть пунктов — по ним проверяют историю. Отмечайте по ходу.</p>
+    <div id="qc"></div>
+    <div id="qcOut" style="margin-top:10px"></div>
+  </div>
+</section>
+
+<!-- ══ ЗАПИСЬ ══ -->
+<section id="rec">
+  <div class="card">
+    <h2>Запись в историю</h2>
+    <p class="lead">Собирается из того, что вы ввели на вкладках «Диагноз», «Duck Score» и «Антибиотики». Проверьте и поправьте руками — это черновик, а не документ.</p>
+    <div class="row"><label>Срок беременности</label><input type="number" id="i_gw" placeholder="—"><span class="unit">нед</span></div>
+    <div class="row"><label></label><input type="number" id="i_gd" placeholder="—"><span class="unit">дн</span></div>
+    <div class="row"><label>Безводный промежуток</label><input type="number" id="i_dry" placeholder="—"><span class="unit">ч</span></div>
+    <button class="act" id="build">Собрать запись</button>
+    <div style="margin-top:12px"><pre class="note" id="noteOut">Заполните данные и нажмите «Собрать запись».</pre></div>
+    <button class="act ghost" id="copy">Скопировать</button>
+  </div>
+</section>
+
+<div class="src wrap" style="margin:20px auto 30px">
+  Тактика — Клинические рекомендации «Инфекции амниотической полости и плодных оболочек (хориоамнионит)», O41.1, ID 776, РОАГ, 2023, пересмотр не позднее 2025.<br>
+  Chorio Duck Score — Chandraharan E, Bolten M. Eur J Med Health Sci. 2024;6(1):1–9 (CC BY 4.0). CTG-контекст — International expert consensus statement on physiological interpretation of CTG: first revision. Eur J Obstet Gynecol Reprod Biol. 2024;302:346–355.<br>
+  Вспомогательный инструмент. Решение принимает врач по клинической ситуации.
+</div>
+
+</div>
+
+<script>
+/* ── навигация ── */
+var tabs=document.querySelectorAll('.tab'),secs=document.querySelectorAll('section');
+tabs.forEach(function(b){b.addEventListener('click',function(){
+  tabs.forEach(function(x){x.classList.toggle('on',x===b)});
+  secs.forEach(function(s){s.classList.toggle('on',s.id===b.dataset.t)});
+  var rail=document.querySelector('#rail .inner');
+  rail.scrollTo({left:Math.max(0,b.offsetLeft-60),behavior:'smooth'});
+  window.scrollTo({top:0,behavior:'smooth'});
+});});
+
+var $=function(id){return document.getElementById(id)};
+var num=function(id){var v=parseFloat($(id).value);return isNaN(v)?null:v};
+
+/* ── диагноз ── */
+function dx(){
+  var t=num('i_t'),mhr=num('i_mhr'),fhr=num('i_fhr'),wbc=num('i_wbc'),
+      disch=$('i_disch').checked,gks=$('i_gks').checked;
+  var fever=t!==null&&t>=38.0;
+  var C=[
+    {n:'Тахикардия плода ≥160/мин', v:fhr!==null&&fhr>=160, got:fhr!==null, txt:fhr!==null?fhr+'/мин':'нет данных'},
+    {n:'Тахикардия матери ≥100/мин', v:mhr!==null&&mhr>=100, got:mhr!==null, txt:mhr!==null?mhr+'/мин':'нет данных'},
+    {n:'Лейкоцитоз >15×10⁹/л', v:!gks&&wbc!==null&&wbc>15, got:wbc!==null, txt:gks?'не учитывается — ГКС':(wbc!==null?wbc+'×10⁹/л':'нет данных')},
+    {n:'Гноевидные выделения', v:disch, got:true, txt:disch?'есть':'нет'}
+  ];
+  var n=C.reduce(function(a,c){return a+(c.v?1:0)},0);
+  var h='<div class="verdict '+(fever&&n>=2?'v-yes':(fever||n>=2?'v-warn':'v-no'))+'">';
+  h+='<div class="v-title">'+(fever&&n>=2
+      ?'Критерии клинического хориоамнионита выполнены'
+      :(t===null?'Введите температуру'
+        :(!fever?'Лихорадки <38,0 °C нет — диагноз по этим критериям не ставится'
+          :'Лихорадка есть, признаков '+n+' из нужных 2')))+'</div>';
+  h+='<div class="crit"><span class="mark '+(fever?'hit':'miss')+'">'+(fever?'●':'○')+'</span><span><b>Фебрильная лихорадка ≥38,0 °C</b> — '+(t!==null?t+' °C':'нет данных')+'</span></div>';
+  C.forEach(function(c){
+    h+='<div class="crit"><span class="mark '+(c.v?'hit':'miss')+'">'+(c.v?'●':'○')+'</span><span><b>'+c.n+'</b> — '+c.txt+'</span></div>';
+  });
+  if(fever&&n>=2) h+='<div style="margin-top:9px;font-size:13.5px">Начать антибиотикотерапию и парацетамол. Родоразрешение — в течение 24 ч. Непрерывная КТГ. Послед — на гистологию.</div>';
+  var crp=num('i_crp');
+  if(crp!==null&&crp>5) h+='<div style="margin-top:8px;font-size:13px;color:var(--dim)">СРБ '+crp+' мг/л — выше порога 5 мг/л. Повторить вместе с ОАК через 12 ч.</div>';
+  h+='</div>';
+  $('dxOut').innerHTML=h;
+}
+['i_t','i_mhr','i_fhr','i_wbc','i_crp'].forEach(function(id){$(id).addEventListener('input',dx)});
+['i_disch','i_gks'].forEach(function(id){$(id).addEventListener('change',dx)});
+
+/* ── Duck Score ── */
+var P=[
+ {k:'base',n:'Базальный ритм — признак роста метаболизма',o:[
+  'Соответствует сроку гестации, прироста от начала записи нет',
+  'Прирост базального ритма <10% от начала записи',
+  'Не соответствует сроку · прирост >10% · любой прирост при отсутствии цикличности, ZigZag или синусоиде · прогрессирующее снижение базального ритма']},
+ {k:'neuro',n:'Признаки нейровоспаления',o:[
+  'Вариабельность 5–25 уд/мин, цикличность есть, синусоиды нет',
+  '<5 или >25 уд/мин (ZigZag) менее 2 мин · цикличности нет >50 мин · синусоида <20 мин на повышенном ритме без акцелераций',
+  '<5 или >25 уд/мин более 2 мин или повторные эпизоды ZigZag · цикличности нет >20 мин на повышенном базальном ритме · синусоида >20 мин']},
+ {k:'mec',n:'Меконий',o:[
+  'Отсутствует',
+  'Есть при нормальной КТГ',
+  'Есть на фоне повышенного базального ритма и/или признаков нейровоспаления']},
+ {k:'myo',n:'Миометральная раздражимость (токо)',o:[
+  'Отсутствует',
+  'Есть без изменений на КТГ',
+  'Есть на фоне повышенного базального ритма, мекония или признаков нейровоспаления']},
+ {k:'mat',n:'Материнские параметры',o:[
+  'Тахикардии и лихорадки нет',
+  'Тахикардия без лихорадки',
+  'Есть лихорадка']}
+];
+var duck={};
+(function(){
+  var h='';
+  P.forEach(function(p){
+    h+='<div class="param"><div class="param-name"><span>'+p.n+'</span><span class="pts" id="pt_'+p.k+'">—</span></div><div class="opts">';
+    p.o.forEach(function(o,i){
+      h+='<label class="opt" data-k="'+p.k+'" data-v="'+i+'"><input type="radio" name="'+p.k+'"><span class="n">'+i+'</span><span>'+o+'</span></label>';
+    });
+    h+='</div></div>';
+  });
+  $('params').innerHTML=h;
+  document.querySelectorAll('.opt').forEach(function(el){
+    el.addEventListener('click',function(){
+      var k=el.dataset.k,v=+el.dataset.v;
+      duck[k]=v;
+      document.querySelectorAll('.opt[data-k="'+k+'"]').forEach(function(x){x.classList.toggle('sel',x===el)});
+      el.querySelector('input').checked=true;
+      $('pt_'+k).textContent=v+' б.';
+      duckSum();
+    });
+  });
+})();
+function duckTotal(){var s=0,n=0;for(var k in duck){s+=duck[k];n++}return {s:s,n:n}}
+function duckSum(){
+  var d=duckTotal();
+  $('sc').innerHTML=d.s+'<span> / 10</span>';
+  var f=$('fill');f.style.width=(d.s*10)+'%';
+  f.style.background=d.s>5?'var(--alarm)':(d.s>=4?'var(--fever)':'var(--calm)');
+  $('scLabel').textContent=d.n<5?('заполнено '+d.n+' из 5'):'порог >5';
+  var m;
+  if(d.n<5) m='Заполнено '+d.n+' из 5 параметров — счёт неполный.';
+  else if(d.s>5) m='<b style="color:var(--alarm)">Больше 5.</b> Оценить клинический контекст и ускорить родоразрешение, если самопроизвольные роды не близки. Наслоение схваток на воспаление — то, чего избегаем.';
+  else if(d.s>=4) m='<b style="color:var(--fever)">Пограничный.</b> Порог не пройден, но динамика важнее точки: пересчитать через 30–60 мин, посмотреть на прирост базального ритма от исходного.';
+  else m='<b style="color:var(--calm)">Ниже порога.</b> Продолжить наблюдение, пересчитывать при изменении картины или появлении новых факторов.';
+  $('scMsg').innerHTML=m;
+}
+duckSum();
+
+/* ── гентамицин ── */
+function gent(){
+  var w=num('i_wt');
+  if(w===null||w<=0){$('gentOut').innerHTML='<small>Введите массу тела — покажу обе схемы дозирования гентамицина.</small>';return}
+  var d24=Math.round(w*5), ld=Math.round(w*2), md=Math.round(w*1.5);
+  $('gentOut').innerHTML=
+   '<div class="grid3">'+
+   '<div class="box"><div class="ttl">Раз в сутки</div><div style="font:700 21px ui-monospace,Menlo,monospace;margin-bottom:4px">'+d24+' мг</div><small>5 мг/кг в/в каждые 24 ч</small></div>'+
+   '<div class="box"><div class="ttl">Трижды в сутки</div><div style="font:700 21px ui-monospace,Menlo,monospace;margin-bottom:4px">'+ld+' → '+md+' мг</div><small>2 мг/кг, далее 1,5 мг/кг в/в каждые 8 ч</small></div>'+
+   '</div>';
+}
+$('i_wt').addEventListener('input',gent);gent();
+
+/* ── критерии качества ── */
+var QC=[
+ 'Определён срок беременности и родов по дате последней менструации и данным УЗИ',
+ 'Исследованы лейкоциты крови и С-реактивный белок',
+ 'Выполнен посев отделяемого половых органов на аэробы и факультативные анаэробы',
+ 'Родоразрешение в течение 24 ч после постановки диагноза',
+ 'Выполнено патологоанатомическое исследование последа',
+ 'Проведена антибактериальная терапия'
+];
+(function(){
+  var h='';QC.forEach(function(q,i){h+='<label class="chk"><input type="checkbox" class="qc" data-i="'+i+'"><span>'+q+'</span></label>'});
+  $('qc').innerHTML=h;
+  document.querySelectorAll('.qc').forEach(function(c){c.addEventListener('change',qcSum)});
+  qcSum();
+})();
+function qcSum(){
+  var all=document.querySelectorAll('.qc'),n=0;
+  all.forEach(function(c){if(c.checked)n++});
+  $('qcOut').innerHTML='<div class="verdict '+(n===6?'v-no':'v-warn')+'"><div class="v-title">'+n+' из 6</div>'+
+    (n===6?'Все критерии закрыты.':'Незакрытых пунктов: '+(6-n)+'. Каждый — потенциальный вопрос при разборе случая.')+'</div>';
+}
+
+/* ── запись ── */
+$('build').addEventListener('click',function(){
+  var t=num('i_t'),mhr=num('i_mhr'),fhr=num('i_fhr'),wbc=num('i_wbc'),crp=num('i_crp'),
+      w=num('i_wt'),gw=num('i_gw'),gd=num('i_gd'),dry=num('i_dry');
+  var L=[];
+  L.push('ХОРИОАМНИОНИТ (O41.1)');
+  if(gw!==null) L.push('Срок беременности: '+gw+' нед'+(gd!==null?' '+gd+' дн':''));
+  if(dry!==null) L.push('Безводный промежуток: '+dry+' ч'+(dry>=18?' (риск ХА ×6,9)':(dry>=12?' (риск ХА ×5,8)':'')));
+  L.push('');
+  L.push('ОБЪЕКТИВНО');
+  if(t!==null) L.push('  t тела '+t+' °C');
+  if(mhr!==null) L.push('  ЧСС матери '+mhr+'/мин');
+  if(fhr!==null) L.push('  ЧСС плода '+fhr+'/мин');
+  if(wbc!==null) L.push('  Лейкоциты '+wbc+'×10⁹/л'+(wbc>15?' — выше порога 15':''));
+  if(crp!==null) L.push('  СРБ '+crp+' мг/л'+(crp>5?' — выше порога 5':''));
+  if($('i_disch').checked) L.push('  Гноевидные выделения из половых путей');
+  var fever=t!==null&&t>=38.0;
+  var cnt=(fhr!==null&&fhr>=160?1:0)+(mhr!==null&&mhr>=100?1:0)+((!$('i_gks').checked&&wbc!==null&&wbc>15)?1:0)+($('i_disch').checked?1:0);
+  L.push('');
+  L.push('Критерии КР 776: лихорадка ≥38,0 °C '+(fever?'ЕСТЬ':'нет')+', дополнительных признаков '+cnt+' из 2 необходимых.');
+  var d=duckTotal();
+  if(d.n>0) L.push('Chorio Duck Score: '+d.s+'/10'+(d.n<5?' (заполнено '+d.n+' из 5 параметров)':'')+(d.s>5?' — выше порога 5':''));
+  L.push('');
+  L.push('НАЗНАЧЕНО');
+  L.push('  Антибактериальная терапия: ампициллин 2 г в/в каждые 6 ч');
+  if(w!==null) L.push('    + гентамицин '+Math.round(w*5)+' мг в/в каждые 24 ч (5 мг/кг, масса '+w+' кг)');
+  else L.push('    + гентамицин 5 мг/кг в/в каждые 24 ч');
+  if(fever) L.push('  Парацетамол 1 г в/в (далее 500 мг каждые 4–6 ч, не более 4 г/сут)');
+  if(gw!==null&&gw>=24&&gw<34){
+    L.push('  Магния сульфат: 4 г за 20–30 мин, далее 1 г/ч в/в до 24 ч — нейропротекция');
+    L.push('  Профилактика РДС плода — рассмотреть, родоразрешение не откладывать');
+  }
+  L.push('  Непрерывная КТГ');
+  L.push('  Термометрия каждые 4 ч; ОАК и СРБ каждые 12 ч до родоразрешения');
+  L.push('  Посев отделяемого половых путей — однократно');
+  L.push('  Послед — на патологоанатомическое исследование');
+  L.push('');
+  L.push('ПЛАН: родоразрешение в течение 24 ч от постановки диагноза. Способ — через естественные родовые пути при отсутствии показаний к КС. При КС дополнительно клиндамицин 900 мг в/в или метронидазол 500 мг в/в.');
+  L.push('Антибиотики отменить после родов при отсутствии клиники эндометрита в течение 24 ч.');
+  $('noteOut').textContent=L.join('\n');
+});
+$('copy').addEventListener('click',function(){
+  var txt=$('noteOut').textContent;
+  var b=$('copy');
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(txt).then(function(){b.textContent='Скопировано';setTimeout(function(){b.textContent='Скопировать'},1600)},
+    function(){b.textContent='Скопировать не удалось — выделите текст вручную'});
+  } else {b.textContent='Выделите текст вручную'}
+});
+
+dx();
+</script>
+</body>
+</html>
