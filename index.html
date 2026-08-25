@@ -122,6 +122,19 @@ button.act:active{transform:translateY(1px)}
 button.ghost{background:transparent;color:var(--dim);border:1px solid var(--line)}
 pre.note{background:var(--surface2);border:1px solid var(--line);border-radius:10px;padding:12px;
   white-space:pre-wrap;word-wrap:break-word;font:13px/1.55 ui-monospace,Menlo,monospace;color:var(--ink);margin:0}
+
+.seg2{display:flex;gap:6px;flex-wrap:wrap}
+.seg2 button{background:var(--surface2);border:1px solid var(--line);color:var(--dim);border-radius:8px;
+  padding:8px 12px;font:600 13px inherit;cursor:pointer}
+.seg2 button.on{background:var(--fever);border-color:var(--fever);color:#14100A}
+.seg2 button:focus-visible{outline:2px solid var(--calm);outline-offset:2px}
+.blk{display:none}.blk.on{display:block}
+.diff{background:rgba(138,124,200,.09);border:1px solid rgba(138,124,200,.4);border-radius:10px;padding:11px;margin-top:11px}
+.diff-t{font:700 12px ui-monospace,Menlo,monospace;letter-spacing:.05em;text-transform:uppercase;color:var(--violet);margin-bottom:6px}
+.diff ul{margin:0;padding-left:17px;font-size:13px}
+.warn{background:rgba(226,80,63,.09);border:1px solid rgba(226,80,63,.42);border-radius:10px;padding:11px;margin-top:11px;font-size:13px;line-height:1.45}
+.warn-t{font:700 12px ui-monospace,Menlo,monospace;letter-spacing:.05em;text-transform:uppercase;color:var(--alarm);margin-bottom:6px}
+.dose{font:700 21px ui-monospace,Menlo,monospace;margin-bottom:4px}
 .src{color:var(--faint);font-size:11.5px;line-height:1.5;margin-top:14px;padding-top:10px;border-top:1px solid var(--line)}
 </style>
 </head>
@@ -276,38 +289,114 @@ pre.note{background:var(--surface2);border:1px solid var(--line);border-radius:1
 <!-- ══ АНТИБИОТИКИ ══ -->
 <section id="abx">
   <div class="card">
-    <h2>Антибактериальная терапия</h2>
-    <p class="lead">Снижает неонатальную заболеваемость и гнойно-септические осложнения у матери. <span class="pill c">A / 1</span> Начинать сразу при постановке клинического диагноза.</p>
-    <div class="row"><label>Масса тела — для расчёта гентамицина</label><input type="number" id="i_wt" placeholder="—"><span class="unit">кг</span></div>
+    <h2>Антибиотики</h2>
+    <p class="lead">Основной источник — <b>внутренний протокол перинатального центра</b>. Там, где он расходится с КР 776, расхождение показано отдельной строкой.</p>
+    <div class="seg2" id="abxNav">
+      <button class="on" data-b="b_ha">Хориоамнионит</button>
+      <button data-b="b_gbs">Стрептококк B</button>
+      <button data-b="b_cs">Кесарево</button>
+      <button data-b="b_prpo">ПРПО</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Расчёт по пациентке</h3>
+    <div class="row"><label>Масса тела</label><input type="number" id="i_wt" placeholder="—"><span class="unit">кг</span></div>
+    <div class="row"><label>Рост</label><input type="number" id="i_ht" placeholder="—"><span class="unit">см</span></div>
+    <div id="bmiOut"></div>
     <div id="gentOut" style="margin-top:10px"></div>
   </div>
 
-  <div class="card">
-    <h3>Схемы выбора</h3>
-    <table>
-      <tr><th>Схема</th><th>Дозирование</th></tr>
-      <tr><td><b>Ампициллин + гентамицин</b></td><td>Ампициллин 2 г в/в каждые 6 ч<br>+ гентамицин по расчёту выше</td></tr>
-      <tr><td><b>Цефазолин + гентамицин</b></td><td>Цефазолин 2 г в/в каждые 8 ч<br>+ гентамицин по расчёту выше</td></tr>
-    </table>
-    <h3>Монотерапия</h3>
-    <table>
-      <tr><td>Ампициллин + сульбактам</td><td class="num">1,5 г в/в q6ч</td></tr>
-      <tr><td>Цефокситин</td><td class="num">2 г в/в q8ч</td></tr>
-      <tr><td>Цефтриаксон</td><td class="num">1 г q24ч<br>до 4 г/сут при тяжёлом течении</td></tr>
-    </table>
-    <h3>Аллергия на пенициллины</h3>
-    <table>
-      <tr><td>Клиндамицин</td><td class="num">900 мг в/в q8ч</td></tr>
-      <tr><td>или ванкомицин</td><td class="num">1 г в/в q12ч</td></tr>
-      <tr><td>+ гентамицин</td><td class="num">по расчёту выше</td></tr>
-    </table>
+  <!-- ХОРИОАМНИОНИТ -->
+  <div class="blk on" id="b_ha">
+    <div class="card">
+      <h3>Хориоамнионит — протокол ПЦ</h3>
+      <table>
+        <tr><th>Схема</th><th>Дозирование</th></tr>
+        <tr><td><b>1.</b> Цефазолин<br>+ гентамицин</td><td class="num">2 г в/в q8ч<br>5 мг/кг в/в q24ч</td></tr>
+        <tr><td><b>2.</b> Ампициллин / сульбактам</td><td class="num">2000 + 1000 мг в/в q6ч<br><span style="color:var(--faint);font-weight:400">4 флакона 500+250</span></td></tr>
+        <tr><td><b>3.</b> При аллергии на бета-лактамы — клиндамицин</td><td class="num">900 мг в/в q8ч</td></tr>
+        <tr><td><b>4.</b> Цефтриаксон</td><td class="num">1 г в/в q24ч<br>до 4 г/сут при тяжёлом течении</td></tr>
+      </table>
+      <div class="diff">
+        <div class="diff-t">Чем отличается КР 776</div>
+        <ul>
+          <li>Позиции 2 и 3 в КР идут <b>в сочетании с гентамицином</b>: ампициллин + гентамицин, клиндамицин или ванкомицин + гентамицин. В протоколе ПЦ они стоят как монотерапия.</li>
+          <li>Монотерапия ампициллин/сульбактам в КР — <b>1,5 г q6ч</b> (500+250 ×2), в протоколе ПЦ вдвое больше.</li>
+          <li>КР даёт для гентамицина и второй режим: 2 мг/кг, далее 1,5 мг/кг q8ч.</li>
+        </ul>
+      </div>
+      <div class="warn">
+        <div class="warn-t">Проверить у автора протокола</div>
+        В листе к гентамицину приписано «вес пациентки умножаем на 3». Для 5 мг/кг это не сходится: при 70 кг доза 350 мг, а не 210. Вероятно, множитель относится к числу флаконов или миллилитрам, но из текста это не читается. Расчёт ниже сделан по формуле <b>5 мг/кг</b>.
+      </div>
+    </div>
+    <div class="card">
+      <h3>При кесаревом на фоне хориоамнионита</h3>
+      <p>Дополнительно <b>клиндамицин 900 мг в/в</b> или <b>метронидазол 500 мг в/в</b>. <span class="pill">B / 2</span></p>
+      <h3>Отмена</h3>
+      <p>После родов — при отсутствии клиники эндометрита в течение 24 ч. <span class="pill c">A / 2</span></p>
+    </div>
   </div>
 
-  <div class="card">
-    <h3>При родоразрешении путём КС</h3>
-    <p>Дополнительная доза: <b>клиндамицин 900 мг в/в</b> или <b>метронидазол 500 мг в/в</b>. <span class="pill">B / 2</span></p>
-    <h3>Когда отменять</h3>
-    <p>В послеродовом периоде — при отсутствии клиники эндометрита в течение 24 ч. <span class="pill c">A / 2</span> Метаанализ не показал разницы в частоте осложнений между продолжением антибиотиков и плацебо после родов.</p>
+  <!-- GBS -->
+  <div class="blk" id="b_gbs">
+    <div class="card">
+      <h3>Стрептококк группы B — протокол ПЦ</h3>
+      <p class="lead">Вводить при развитии родовой деятельности <b>даже при целом плодном пузыре</b>, а также при преждевременном излитии вод до начала родовой деятельности.</p>
+      <table>
+        <tr><th>Препарат</th><th>Дозирование</th></tr>
+        <tr><td>Цефазолин</td><td class="num">1000 мг в/в q6ч<br>до окончания родов</td></tr>
+        <tr><td>Ампициллин / сульбактам</td><td class="num">500 мг в/в q6ч<br><span style="color:var(--faint);font-weight:400">1 флакон 500+250</span></td></tr>
+        <tr><td>При аллергии на бета-лактамы — клиндамицин</td><td class="num">300 мг в/в q8ч<br>до окончания родов</td></tr>
+      </table>
+      <div class="warn">
+        <div class="warn-t">Стоит уточнить</div>
+        Дозы ниже общепринятых для интранатальной профилактики GBS, где обычно даётся нагрузочная доза с последующим поддерживающим введением и более коротким интервалом. Возможно, это осознанное решение центра — но пациентке с известным носительством дозу лучше сверить у составителя листа.
+      </div>
+      <small>КР 776 схем интранатальной профилактики GBS не приводит — только скрининг в 36⁰–37⁶ нед.</small>
+    </div>
+  </div>
+
+  <!-- КС -->
+  <div class="blk" id="b_cs">
+    <div class="card">
+      <h3>Кесарево сечение — протокол ПЦ</h3>
+      <table>
+        <tr><th>Препарат</th><th>Дозирование</th></tr>
+        <tr><td>Цефазолин</td><td class="num">1000 мг в/в медленно<br>за 30 мин до операции</td></tr>
+        <tr><td>Ампициллин / сульбактам</td><td class="num">1000 + 500 мг в/в медленно<br><span style="color:var(--faint);font-weight:400">2 флакона 500+250</span></td></tr>
+        <tr><td>При аллергии на бета-лактамы — клиндамицин</td><td class="num">600 мг в/в</td></tr>
+      </table>
+      <h3>Поправка на массу</h3>
+      <ul>
+        <li>ИМТ ≥ 30 кг/м² — доза антибиотика <b>удваивается</b></li>
+        <li>ИМТ &gt; 35 — курс антибактериальной терапии продолжается <b>48 часов</b></li>
+      </ul>
+      <small>Введите рост и массу выше — поправка посчитается и подставится в дозы.</small>
+    </div>
+  </div>
+
+  <!-- ПРПО -->
+  <div class="blk" id="b_prpo">
+    <div class="card">
+      <h3>ПРПО — протокол ПЦ</h3>
+      <p class="lead">Одинаково при преждевременных родах и при доношенной беременности.</p>
+      <table>
+        <tr><th>Препарат</th><th>Дозирование</th></tr>
+        <tr><td>Ампициллин / сульбактам</td><td class="num">1000 мг в/в q6ч<br><span style="color:var(--faint);font-weight:400">2 флакона 500+250</span></td></tr>
+        <tr><td>При аллергии на бета-лактамы — клиндамицин</td><td class="num">300 мг в/в q8ч</td></tr>
+      </table>
+      <div class="diff">
+        <div class="diff-t">Чем отличается КР 776</div>
+        <ul>
+          <li>КР — при ПРПО <b>менее 36⁶ нед</b>; протокол ПЦ распространяет схему и на доношенную беременность.</li>
+          <li>Ампициллин в КР — <b>2 г в/в q6ч в течение 48 ч</b>, вдвое больше разовой дозы и с ограничением по длительности.</li>
+          <li>КР даёт также амоксициллин 250 мг q8ч × 5 дней или эритромицин 250 мг q6ч до 10 дней.</li>
+        </ul>
+      </div>
+      <small>Повторный курс — по результатам инфекционно-воспалительного мониторинга.</small>
+    </div>
   </div>
 
   <div class="card">
@@ -416,6 +505,7 @@ pre.note{background:var(--surface2);border:1px solid var(--line);border-radius:1
 </section>
 
 <div class="src wrap" style="margin:20px auto 30px">
+  Схемы антибиотиков — внутренний протокол перинатального центра «Схемы антимикробной профилактики и терапии»; расхождения с федеральным документом отмечены отдельно.<br>
   Тактика — Клинические рекомендации «Инфекции амниотической полости и плодных оболочек (хориоамнионит)», O41.1, ID 776, РОАГ, 2023, пересмотр не позднее 2025.<br>
   Chorio Duck Score — Chandraharan E, Bolten M. Eur J Med Health Sci. 2024;6(1):1–9 (CC BY 4.0). CTG-контекст — International expert consensus statement on physiological interpretation of CTG: first revision. Eur J Obstet Gynecol Reprod Biol. 2024;302:346–355.<br>
   Вспомогательный инструмент. Решение принимает врач по клинической ситуации.
@@ -529,18 +619,46 @@ function duckSum(){
 }
 duckSum();
 
-/* ── гентамицин ── */
-function gent(){
-  var w=num('i_wt');
-  if(w===null||w<=0){$('gentOut').innerHTML='<small>Введите массу тела — покажу обе схемы дозирования гентамицина.</small>';return}
-  var d24=Math.round(w*5), ld=Math.round(w*2), md=Math.round(w*1.5);
+/* ── подвкладки антибиотиков ── */
+$('abxNav').addEventListener('click',function(e){
+  if(e.target.tagName!=='BUTTON')return;
+  [].forEach.call($('abxNav').children,function(b){b.classList.toggle('on',b===e.target)});
+  ['b_ha','b_gbs','b_cs','b_prpo'].forEach(function(id){$(id).classList.toggle('on',id===e.target.dataset.b)});
+});
+
+/* ── ИМТ и гентамицин ── */
+function calcAbx(){
+  var w=num('i_wt'),h=num('i_ht');
+  var bmi=null;
+  if(w&&h&&h>50) bmi=w/Math.pow(h/100,2);
+
+  if(bmi===null){
+    $('bmiOut').innerHTML='<small style="margin-top:8px">Введите рост и массу — посчитаю ИМТ и поправку к дозам для кесарева.</small>';
+  } else {
+    var x2=bmi>=30, long48=bmi>35;
+    var h2='<div class="box" style="margin-top:10px"><div class="ttl">ИМТ</div><div class="dose">'+bmi.toFixed(1)+' кг/м²</div>';
+    if(long48) h2+='<div style="color:var(--alarm);font-weight:700;font-size:13.5px;margin-top:4px">Доза ×2 · курс продолжить 48 ч</div>'+
+      '<small style="margin-top:5px">Цефазолин 2000 мг · ампициллин/сульбактам 2000+1000 мг · клиндамицин 1200 мг</small>';
+    else if(x2) h2+='<div style="color:var(--fever);font-weight:700;font-size:13.5px;margin-top:4px">Доза антибиотика ×2</div>'+
+      '<small style="margin-top:5px">Цефазолин 2000 мг · ампициллин/сульбактам 2000+1000 мг · клиндамицин 1200 мг</small>';
+    else h2+='<small style="margin-top:4px">Поправка не требуется — дозы по протоколу без удвоения</small>';
+    h2+='</div>';
+    $('bmiOut').innerHTML=h2;
+  }
+
+  if(w===null||w<=0){$('gentOut').innerHTML='<small>Введите массу тела — посчитаю гентамицин.</small>';return}
+  var d24=Math.round(w*5), vials=(d24/80), ld=Math.round(w*2), md=Math.round(w*1.5);
   $('gentOut').innerHTML=
    '<div class="grid3">'+
-   '<div class="box"><div class="ttl">Раз в сутки</div><div style="font:700 21px ui-monospace,Menlo,monospace;margin-bottom:4px">'+d24+' мг</div><small>5 мг/кг в/в каждые 24 ч</small></div>'+
-   '<div class="box"><div class="ttl">Трижды в сутки</div><div style="font:700 21px ui-monospace,Menlo,monospace;margin-bottom:4px">'+ld+' → '+md+' мг</div><small>2 мг/кг, далее 1,5 мг/кг в/в каждые 8 ч</small></div>'+
+   '<div class="box"><div class="ttl">Гентамицин · протокол ПЦ</div><div class="dose">'+d24+' мг</div>'+
+   '<small>5 мг/кг в/в каждые 24 ч<br>это '+vials.toFixed(1)+' флакона по 80 мг</small></div>'+
+   '<div class="box"><div class="ttl">Альтернатива по КР</div><div class="dose">'+ld+' → '+md+' мг</div>'+
+   '<small>2 мг/кг, далее 1,5 мг/кг в/в каждые 8 ч</small></div>'+
    '</div>';
 }
-$('i_wt').addEventListener('input',gent);gent();
+$('i_wt').addEventListener('input',calcAbx);
+$('i_ht').addEventListener('input',calcAbx);
+calcAbx();
 
 /* ── критерии качества ── */
 var QC=[
@@ -588,7 +706,7 @@ $('build').addEventListener('click',function(){
   if(d.n>0) L.push('Chorio Duck Score: '+d.s+'/10'+(d.n<5?' (заполнено '+d.n+' из 5 параметров)':'')+(d.s>5?' — выше порога 5':''));
   L.push('');
   L.push('НАЗНАЧЕНО');
-  L.push('  Антибактериальная терапия: ампициллин 2 г в/в каждые 6 ч');
+  L.push('  Антибактериальная терапия по протоколу ПЦ: цефазолин 2 г в/в каждые 8 ч');
   if(w!==null) L.push('    + гентамицин '+Math.round(w*5)+' мг в/в каждые 24 ч (5 мг/кг, масса '+w+' кг)');
   else L.push('    + гентамицин 5 мг/кг в/в каждые 24 ч');
   if(fever) L.push('  Парацетамол 1 г в/в (далее 500 мг каждые 4–6 ч, не более 4 г/сут)');
